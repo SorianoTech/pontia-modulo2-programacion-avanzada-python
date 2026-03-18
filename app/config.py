@@ -9,7 +9,14 @@ class Settings(BaseSettings):
 
     # Base de datos
     DATABASE_URL: str = "sqlite:///./todos.db"
+    # JWT
+    # IMPORTANTE: En producción, cambia esta clave por una segura
+    SECRET_KEY: str = "dev-secret-key-change-this-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # CORS (Pydantic convertirá automáticamente strings JSON a listas)
+    ALLOWED_ORIGINS: list[str] = ["*"]
 
     # Configuración de carga (prioriza variables de entorno, luego .env)
     model_config = SettingsConfigDict(

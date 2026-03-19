@@ -1,7 +1,9 @@
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+import os
+
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from .limiter import limiter
@@ -58,7 +60,24 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ────────────────────────────────────────────
-#  Middleware CORS (Módulo 10 - Seguridad)
+#  Manejo de Excepciones 404 (Star Wars)
+# ────────────────────────────────────────────
+@app.exception_handler(404)
+async def not_found_exception_handler(request: Request, exc):
+    """Manejador personalizado para errores 404 con temática de Star Wars."""
+    template_path = os.path.join(os.path.dirname(__file__), "templates", "404.html")
+    try:
+        with open(template_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return HTMLResponse(content=content, status_code=404)
+    except FileNotFoundError:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Página no encontrada (y no se pudo cargar el template de Star Wars)"}
+        )
+
+# ────────────────────────────────────────────
+#  Middleware CORS 
 # ────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,

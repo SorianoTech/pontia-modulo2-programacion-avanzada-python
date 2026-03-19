@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página No Encontrada</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+            color: #ffc107;
+            display: flex;
+            align-content: center;
+            justify-content: center;
+        }
+
+        .star-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000 url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat top center;
+            z-index: 0;
+            animation: move-stars 200s linear infinite;
+        }
+
+        @keyframes move-stars {
+            from { background-position: 0 0; }
+            to { background-position: -10000px 5000px; }
+        }
+
+        .fade {
+            position: relative;
+            width: 100%;
+            min-height: 60vh;
+            top: -25px;
+            background-image: linear-gradient(0deg, transparent, black 75%);
+            z-index: 1;
+        }
+
+        .star-wars {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            height: 800px;
+            color: #feda4a;
+            font-family: 'Pathway Gothic One', sans-serif;
+            font-size: 500%;
+            font-weight: 600;
+            letter-spacing: 6px;
+            line-height: 150%;
+            perspective: 400px;
+            text-align: justify;
+        }
+
+        .crawl {
+            position: relative;
+            top: 9999px;
+            transform-origin: 50% 100%;
+            animation: crawl 60s linear;
+        }
+
+        .crawl > .title {
+            font-size: 90%;
+            text-align: center;
+        }
+
+        .crawl > .title h1 {
+            margin: 0 0 100px;
+            text-transform: uppercase;
+        }
+
+        @keyframes crawl {
+            0% {
+                top: 0;
+                transform: rotateX(20deg) translateZ(0);
+            }
+            100% {
+                top: -6000px;
+                transform: rotateX(25deg) translateZ(-2500px);
+            }
+        }
+
+        .error-code {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15vw;
+            opacity: 0.1;
+            z-index: -1;
+            color: #feda4a;
+        }
+
+        .back-home {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            padding: 10px 20px;
+            background: rgba(254, 218, 74, 0.2);
+            border: 1px solid #feda4a;
+            color: #feda4a;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .back-home:hover {
+            background: #feda4a;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="star-field"></div>
+    <div class="error-code">404</div>
+    <section class="star-wars">
+        <div class="crawl">
+            <div class="title">
+                <p>Episodio 404</p>
+                <h1>PÁGINA NO ENCONTRADA</h1>
+            </div>
+            
+            <p>Hace mucho tiempo, en una galaxia muy, muy lejana...</p>
+            <p>Te has desviado de tu curso estelar. Los sistemas de navegación indican que la ubicación que buscas no existe en nuestros archivos imperiales.</p>
+            <p>Es inútil resistirse. Lo que estás buscando no se encuentra aquí. Tal vez fue destruido por la Estrella de la Muerte o simplemente nunca existió.</p>
+            <p>Usa la Fuerza para regresar a un lugar seguro. El Consejo Jedi te espera en la página de inicio.</p>
+            <p>Recuerda: "El miedo es el camino hacia el lado oscuro. El miedo lleva a la ira, la ira lleva al odio, el odio lleva al sufrimiento."</p>
+            <p>... o tal vez solo escribiste mal la URL.</p>
+        </div>
+    </section>
+    <a href="/" class="back-home">VOLVER A CASA</a>
+</body>
+</html>

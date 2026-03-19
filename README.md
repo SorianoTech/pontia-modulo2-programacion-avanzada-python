@@ -110,11 +110,12 @@ Navega a **http://127.0.0.1:8000/docs** para la documentación interactiva Swagg
 | GET | `/todos/expired` | Listar tareas caducadas | ✅ |
 | POST | `/todos` | Crear nueva tarea | ✅ |
 | PUT | `/todos/{id}` | Actualizar tarea | ✅ |
+| PATCH | `/todos/{id}/complete` | Marcar tarea como completada (Rápido) | ✅ |
 | DELETE | `/todos/{id}` | Eliminar tarea | ✅ |
 
 ## ⚡ Rate Limiting
 Se han implementado diferentes límites de velocidad para proteger la integridad del servicio:
-- **Endpoints de Tareas**: 100 peticiones por minuto por IP.
+- **Endpoints de Tareas**: 20 peticiones por minuto por IP.
 - **Registro de Usuarios**: 500 peticiones por minuto por IP.
 - **Login (Seguridad)**: Máximo 3 peticiones por minuto para mitigar ataques de fuerza bruta.
 
@@ -124,8 +125,11 @@ Se han implementado diferentes límites de velocidad para proteger la integridad
 - **Contraseñas**: Hasheadas con `bcrypt` (passlib)
 - **JWT**: Tokens con expiración de 30 minutos
 
-## 🛡️ Administración y Managers
-La API cuenta con un sistema de roles para diferenciar usuarios normales de administradores:
-- **Admin Automático**: Al iniciar la aplicación, se crea un usuario `admin` (pass: `admin123`) si no existe.
-- **Control de Acceso**: Solo los usuarios con el flag `is_admin` pueden acceder a la gestión de usuarios (`/auth/users`).
-- **Seguridad**: Se requiere el token JWT de un administrador para consultar datos sensibles de otros usuarios.
+## 🛡️ Administración y Managers (SOLID / Domain Logic)
+La aplicación aplica principios de diseño avanzado para separar responsabilidades:
+- **Admin Automático**: Se crea un usuario `admin` (pass: `admin123`) por defecto.
+- **Control de Acceso**: Solo los usuarios con el flag `is_admin` pueden acceder a `/auth/users`.
+- **NoteManager**: Encapsula las **reglas de negocio** de las tareas:
+  - **Censura**: Filtra palabras malsonantes en las descripciones.
+  - **Validación de Deadlines**: Impide la creación de tareas con fechas límite en el pasado.
+  - **Enriquecimiento**: Proporciona información calculada sobre el tiempo restante (`status_info`).

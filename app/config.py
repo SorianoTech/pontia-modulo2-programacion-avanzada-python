@@ -10,10 +10,15 @@ class Settings(BaseSettings):
     # Base de datos
     DATABASE_URL: str = "sqlite:///./todos.db"
     # JWT
-    # IMPORTANTE: En producción, cambia esta clave por una segura
+    # IMPORTANTE: En producción, cambiar esta clave por una segura
     SECRET_KEY: str = "dev-secret-key-change-this-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Rate limiting
+    RATE_LIMIT: str = "100/minute"
+    AUTH_RATE_LIMIT: str = "500/minute"
+    LOGIN_FAILURE_RATE_LIMIT: str = "3/minute"
 
     # CORS (Pydantic convertirá automáticamente strings JSON a listas)
     ALLOWED_ORIGINS: list[str] = ["*"]

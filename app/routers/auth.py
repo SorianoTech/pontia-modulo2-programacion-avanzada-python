@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-
+from ..limiter import limiter
 from sqlalchemy.orm import Session
 
 from ..config import settings
@@ -23,7 +23,7 @@ router = APIRouter(
     summary="Registrar nuevo usuario",
     description="Crea una cuenta nueva con username, email y contraseña.",
 )
-
+@limiter.limit(settings.AUTH_RATE_LIMIT)
 def register(
     request: Request,
     user_data: UserCreate,
@@ -46,7 +46,7 @@ def register(
     summary="Iniciar sesión",
     description="Autentica un usuario y devuelve un JWT Bearer token.",
 )
-
+@limiter.limit(settings.LOGIN_FAILURE_RATE_LIMIT) # Aplicamos el límite de 3/min aquí para login
 def login(
     request: Request,
     username: str,

@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Depends, Request
-
+from ..limiter import limiter
 from sqlalchemy.orm import Session
 
 from ..config import settings
@@ -24,7 +24,7 @@ router = APIRouter(
     summary="Listar todas mis tareas",
     description="Devuelve todas las tareas pertenecientes al usuario autenticado.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def get_todos(
     request: Request,
     db: Session = Depends(get_db),
@@ -44,7 +44,7 @@ async def get_todos(
     summary="Listar tareas caducadas",
     description="Devuelve las tareas cuya fecha límite ya ha pasado.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def get_expired_todos(
     request: Request,
     db: Session = Depends(get_db),
@@ -60,7 +60,7 @@ async def get_expired_todos(
     summary="Obtener una tarea por ID",
     description="Devuelve el detalle de una tarea específica si pertenece al usuario.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def get_todo(
     request: Request,
     todo_id: int,
@@ -78,7 +78,7 @@ async def get_todo(
     summary="Crear nueva tarea",
     description="Crea una nueva tarea para el usuario autenticado.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def create_todo(
     request: Request,
     todo_data: TodoCreate,
@@ -102,7 +102,7 @@ async def create_todo(
     summary="Actualizar tarea",
     description="Actualiza los campos de una tarea existente. Solo el propietario puede editar.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def update_todo(
     request: Request,
     todo_id: int,
@@ -127,7 +127,7 @@ async def update_todo(
     summary="Eliminar tarea",
     description="Elimina permanentemente una tarea. Solo el propietario puede eliminar.",
 )
-
+@limiter.limit(settings.RATE_LIMIT)
 async def delete_todo(
     request: Request,
     todo_id: int,

@@ -1,7 +1,10 @@
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from .limiter import limiter
 
 from .config import settings
 from .database import engine
@@ -22,6 +25,7 @@ try:
     user_service.create_admin_if_not_exists(db)
 finally:
     db.close()
+
 
 
 # ────────────────────────────────────────────
@@ -47,10 +51,14 @@ Aplica: POO, SOLID, Pydantic, SQLAlchemy, JWT Auth, Rate Limiting y buenas prác
     },
 )
 
-
+# ────────────────────────────────────────────
+#  Configurar Rate Limiter en la app
+# ────────────────────────────────────────────
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ────────────────────────────────────────────
-#  Middleware CORS 
+#  Middleware CORS (Módulo 10 - Seguridad)
 # ────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
@@ -63,7 +71,7 @@ app.add_middleware(
 # ────────────────────────────────────────────
 #  Incluir routers
 # ────────────────────────────────────────────
-
+app.include_router(auth.router)
 app.include_router(todos.router)
 
 

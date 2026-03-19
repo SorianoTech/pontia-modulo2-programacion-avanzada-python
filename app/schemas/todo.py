@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, computed_field
+from ..managers.note_manager import NoteManager
 
 
 class TodoCreate(BaseModel):
@@ -45,5 +46,11 @@ class TodoResponse(BaseModel):
     created_at: datetime
     deadline: datetime | None = None
     owner_id: int
+
+    @computed_field
+    @property
+    def status_info(self) -> str:
+        """Información calculada sobre el estado temporal de la tarea."""
+        return NoteManager.get_time_remaining(self.deadline)
 
     model_config = {"from_attributes": True}

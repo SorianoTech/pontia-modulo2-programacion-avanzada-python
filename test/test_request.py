@@ -87,25 +87,29 @@ def test_api():
     assert data_get["id"] == todo_id, f"ID devuelto ({data_get['id']}) no coincide con el creado ({todo_id})"
     print("✓ Tarea obtenida correctamente y el ID coincide.")
 
-    # 5. Crear Tarea Caducada (Original CP4)
-    print("\n--- CP4: Crear tarea caducada (deadline pasado) ---")
-    deadline_pasado = (datetime.now() - timedelta(days=1)).isoformat()
-    tarea_old = {"title": "Nota Caducada", "deadline": deadline_pasado}
-    resp_old = requests.post(f"{BASE_URL}/todos/", json=tarea_old, headers=headers)
-    assert resp_old.status_code == 201
-    todo_expirado_id = resp_old.json()["id"] 
-    print(f"POST /todos/ (caducada) STATUS: {resp_old.status_code}")
-    assert resp_old.status_code == 201, "Error al crear tarea caducada"
-    print("✓ Tarea caducada creada con éxito.")
+    # 5. Marcar Tarea como Completada (Nuevo Endpoint)
+    print(f"\n--- CP: Marcar tarea como completada (PATCH /todos/{todo_id}/complete) ---")
+    resp_patch = requests.patch(f"{BASE_URL}/todos/{todo_id}/complete", headers=headers)
+    print(f"PATCH /todos/{todo_id}/complete STATUS: {resp_patch.status_code}")
+    assert resp_patch.status_code == 200, f"Error al completar tarea: {resp_patch.text}"
+    
+    data_patch = resp_patch.json()
+    assert data_patch["completed"] is True, "La tarea no se marcó como completada"
+    print("✓ Tarea marcada como completada con éxito.")
 
-    # 6. Listar Caducadas (Original CP5)
-    print("\n--- CP5: Listar tareas caducadas ---")
-    resp_expired = requests.get(f"{BASE_URL}/todos/expired", headers=headers)
-    print(f"GET /todos/expired STATUS: {resp_expired.status_code}")
-    caducadas = resp_expired.json()
-    ids_caducadas = [t["id"] for t in caducadas]
-    assert todo_expirado_id in ids_caducadas, "La tarea caducada no aparece en /expired"
-    print(f"✓ Tareas caducadas listadas: {len(caducadas)} encontradas.")
+    # 6. PRUEBA DE ERROR 400: Regla de dominio (Deadline en el pasado)
+    print("\n--- CP4: Prueba de ERROR 400 (Deadline en el pasado) ---")
+    deadline_pasado = (datetime.now() - timedelta(days=1)).isoformat()
+    tarea_pasada = {
+        "title": "Nota Imposible",
+        "description": "Esto no debería guardarse porque ya ha pasado",
+        "deadline": deadline_pasado
+    }
+    resp_bad = requests.post(f"{BASE_URL}/todos/", json=tarea_pasada, headers=headers)
+    print(f"POST /todos/ (fecha pasada) STATUS: {resp_bad.status_code}")
+    assert resp_bad.status_code == 400, "Debería dar 400 al intentar crear tarea en el pasado"
+    print(f"✓ Error 400 validado correctamente. Motivo: {resp_bad.json().get('detail')}")
+
     
     # 7. Prueba de ERROR 422 (Original CP6 mejorado)
     print("\n--- CP6: Prueba de ERROR 422 (Título vacío) ---")

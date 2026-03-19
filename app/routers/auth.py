@@ -70,11 +70,15 @@ def login(
     "/users",
     response_model=list[UserResponse],
     summary="Listar todos los usuarios",
-    description="Devuelve una lista de todos los usuarios registrados (requiere autenticación).",
+    description="Devuelve una lista de todos los usuarios registrados. **REQUIERE ROL ADMIN**.",
 )
 def get_all_users(
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin),
 ) -> list[UserResponse]:
-    """Obtiene todos los usuarios de la base de datos."""
+    """
+    Obtiene todos los usuarios de la base de datos.
+
+    Requiere: **Bearer token con privilegios de ADMIN**.
+    """
     return user_service.get_users(db)

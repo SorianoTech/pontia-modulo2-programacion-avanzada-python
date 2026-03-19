@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Rate limiting
-    RATE_LIMIT: str = "100/minute"
+    RATE_LIMIT: str = "20/minute"
     AUTH_RATE_LIMIT: str = "500/minute"
     LOGIN_FAILURE_RATE_LIMIT: str = "3/minute"
 

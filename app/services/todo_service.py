@@ -71,6 +71,7 @@ class TodoService:
         """
         Crea una nueva tarea para el usuario indicado.
         La description se sanitiza contra XSS antes de guardar.
+        El deadline se valida usando las reglas de NoteManager.
 
         Args:
             db: Sesión de base de datos.
@@ -80,6 +81,12 @@ class TodoService:
         Returns:
             El nuevo objeto Todo creado.
         """
+        # Validación de reglas de negocio del dominio (deadline)
+        try:
+            NoteManager.validate_deadline(todo_data.deadline)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
         db_todo = Todo(
             title=self._sanitize(todo_data.title),
             description=self._sanitize(todo_data.description),
@@ -112,6 +119,7 @@ class TodoService:
 
         Raises:
             HTTPException 404 si no existe o no pertenece al usuario.
+            HTTPException 400 si el deadline es inválido.
         """
         todo = self.get_todo(db, todo_id, owner_id)
 
@@ -123,6 +131,10 @@ class TodoService:
         if todo_data.completed is not None:
             todo.completed = todo_data.completed
         if todo_data.deadline is not None:
+            try:
+                NoteManager.validate_deadline(todo_data.deadline)
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
             todo.deadline = todo_data.deadline
 
         db.commit()
@@ -148,6 +160,24 @@ class TodoService:
         db.delete(todo)
         db.commit()
         return {"message": f"Tarea '{todo.title}' eliminada correctamente"}
+
+    def complete_todo(self, db: Session, todo_id: int, owner_id: int) -> Todo:
+        """
+        Marca una tarea como completada.
+
+        Args:
+            db: Sesión de base de datos.
+            todo_id: ID de la tarea.
+            owner_id: ID del usuario (verifica ownership).
+
+        Returns:
+            El objeto Todo actualizado.
+        """
+        todo = self.get_todo(db, todo_id, owner_id)
+        todo.completed = True
+        db.commit()
+        db.refresh(todo)
+        return todo
 
     def get_expired_todos(self, db: Session, owner_id: int) -> list[Todo]:
         """

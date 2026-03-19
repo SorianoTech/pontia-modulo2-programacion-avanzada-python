@@ -122,6 +122,27 @@ async def update_todo(
     return todo_service.update_todo(db, todo_id, todo_data, owner_id=current_user.id)
 
 
+@router.patch(
+    "/{todo_id}/complete",
+    response_model=TodoResponse,
+    summary="Marcar tarea como completada",
+    description="Cambia el estado de una tarea a 'completada' (True).",
+)
+@limiter.limit(settings.RATE_LIMIT)
+async def complete_todo(
+    request: Request,
+    todo_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TodoResponse:
+    """
+    Marca una tarea como completada de forma rápida.
+
+    Requiere: **Bearer token** en el header Authorization.
+    """
+    return todo_service.complete_todo(db, todo_id, owner_id=current_user.id)
+
+
 @router.delete(
     "/{todo_id}",
     summary="Eliminar tarea",

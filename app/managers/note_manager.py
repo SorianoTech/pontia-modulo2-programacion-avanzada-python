@@ -47,6 +47,15 @@ class NoteManager:
         return deadline < now
 
     @staticmethod
+    def validate_deadline(deadline: datetime | None):
+        """
+        Regla de negocio: El deadline no puede ser una fecha pasada para tareas nuevas.
+        """
+        if deadline and NoteManager.is_expired(deadline):
+            raise ValueError("El deadline no puede ser una fecha pasada")
+
+
+    @staticmethod
     def get_time_remaining(deadline: datetime | None) -> str:
         """
         Devuelve un mensaje legible con el tiempo restante.

@@ -4,11 +4,16 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from .config import settings
 
 
-# Motor de base de datos (SQLite para desarrollo)
+# Motor de base de datos
+# Detectar si es SQLite para aplicar connect_args específicos
+is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+engine_args = {}
+if is_sqlite:
+    engine_args["connect_args"] = {"check_same_thread": False}
+
 engine = create_engine(
     settings.DATABASE_URL,
-    # SQLite específico: permite acceso desde múltiples threads
-    connect_args={"check_same_thread": False},
+    **engine_args
 )
 
 # Fábrica de sesiones

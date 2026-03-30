@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8080"
 
 def register_bulk(n=100):
     print(f"--- Iniciando registro de {n} usuarios ---")

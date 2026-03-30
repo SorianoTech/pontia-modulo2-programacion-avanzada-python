@@ -3,6 +3,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse
 import os
+import logging
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -19,7 +27,9 @@ from .database import SessionLocal
 #  Crear tablas en la base de datos al arrancar
 # ────────────────────────────────────────────
 from .database import Base
+logger.info("Verificando existencia de tablas en la base de datos...")
 Base.metadata.create_all(bind=engine)
+logger.info("Tablas verificadas/creadas correctamente.")
 
 # Crear admin por defecto si no existe
 db = SessionLocal()

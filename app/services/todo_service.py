@@ -4,6 +4,9 @@ from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+import logging
+
+logger = logging.getLogger(__name__)
 
 from ..models.todo import Todo
 from ..schemas.todo import TodoCreate, TodoUpdate
@@ -96,6 +99,7 @@ class TodoService:
         db.add(db_todo)
         db.commit()
         db.refresh(db_todo)
+        logger.info(f"Tarea '{db_todo.title}' creada con éxito por usuario {owner_id}")
         return db_todo
 
     def update_todo(
@@ -139,6 +143,7 @@ class TodoService:
 
         db.commit()
         db.refresh(todo)
+        logger.info(f"Tarea id={todo_id} actualizada por usuario {owner_id}")
         return todo
 
     def delete_todo(self, db: Session, todo_id: int, owner_id: int) -> dict:
@@ -159,6 +164,7 @@ class TodoService:
         todo = self.get_todo(db, todo_id, owner_id)
         db.delete(todo)
         db.commit()
+        logger.info(f"Tarea id={todo_id} eliminada por usuario {owner_id}")
         return {"message": f"Tarea '{todo.title}' eliminada correctamente"}
 
     def complete_todo(self, db: Session, todo_id: int, owner_id: int) -> Todo:

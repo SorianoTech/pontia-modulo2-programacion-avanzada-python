@@ -1,13 +1,31 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: todolist-db
+    environment:
+      - POSTGRES_USER=todolist_user
+      - POSTGRES_PASSWORD=todolist_password
+      - POSTGRES_DB=todolist_db
+    volumes:
+      - todolist_db_data:/var/lib/postgresql/data
+    networks:
+      - todolist-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todolist_user -d todolist_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: todolist-api
     ports:
-      - "8000:8000"
+      - "8080:8000"
     environment:
-      - DATABASE_URL=sqlite:///./data/todos.db
+      - DATABASE_URL=postgresql://todolist_user:todolist_password@db:5432/todolist_db
       - SECRET_KEY=dev-secret-key-change-this-in-production
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -17,6 +35,11 @@ services:
       - ALLOWED_ORIGINS=["*"]
     volumes:
       - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - todolist-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/')"]
@@ -24,3 +47,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+networks:
+  todolist-network:
+    driver: bridge
+
+volumes:
+  todolist_db_data:
